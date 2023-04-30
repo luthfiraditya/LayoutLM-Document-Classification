@@ -53,9 +53,10 @@ def apply_ocr(example):
         example['words'] = words
         example['bbox'] = boxes
         return example
-    
 
-def encode_training_example(example, max_seq_length=512, pad_token_box=[0, 0, 0, 0]):
+
+def encode_training_example(example, label2idx, max_seq_length=512, pad_token_box=[0, 0, 0, 0]):
+    tokenizer = LayoutLMTokenizer.from_pretrained("microsoft/layoutlm-base-uncased")
     words = example['words']
     normalized_word_boxes = example['bbox']
 
@@ -91,12 +92,11 @@ def encode_training_example(example, max_seq_length=512, pad_token_box=[0, 0, 0,
     return encoding
 
 
-
-def training_dataloader_from_df(data):
+def training_dataloader_from_df(data,training_features):
     dataset = Dataset.from_pandas(data)
     dataset = dataset.map(apply_ocr)
     encoded_dataset = dataset.map(
-        lambda example: encode_training_example(example), features=training_features
+        lambda example: encode_training_example(example, label2idx), features=training_features
     )
 
     encoded_dataset.set_format(
@@ -105,5 +105,6 @@ def training_dataloader_from_df(data):
     dataloader = torch.utils.data.DataLoader(encoded_dataset, batch_size=1, shuffle=True)
     batch = next(iter(dataloader))
     return dataloader
-    
-    
+
+
+

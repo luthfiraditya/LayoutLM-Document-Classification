@@ -22,10 +22,5 @@ def prepare_data(dataset_path):
         ])
     data = pd.DataFrame({'image_path': images, 'label': labels})
 
-    train_data, valid_data = train_test_split(data, test_size=0.09, random_state=0, stratify=data.label)
-    train_data = train_data.reset_index(drop=True)
-    valid_data = valid_data.reset_index(drop=True)
-    print(f"{len(train_data)} training examples, {len(valid_data)} validation examples")
-    
-    return train_data, valid_data, idx2label
+    return data, idx2label, label2idx
 
